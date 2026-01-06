@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reservation-service
+spec:
+  replicas: {{ .Values.reservation.replicaCount }}
+  selector:
+    matchLabels:
+      app: reservation-service
+  template:
+    metadata:
+      labels:
+        app: reservation-service
+    spec:
+      containers:
+        - name: reservation-service
+          image: "{{ .Values.reservation.image.repository }}:{{ .Values.reservation.image.tag }}"
+          imagePullPolicy: {{ .Values.reservation.image.pullPolicy }}
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DATABASE_URL
+              value: {{ .Values.reservation.env.databaseUrl | quote }}
+            - name: AUTH_SERVICE_URL
+              value: {{ .Values.reservation.env.authServiceUrl | quote }}

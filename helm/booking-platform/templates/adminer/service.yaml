@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: adminer
+spec:
+  type: {{ .Values.adminer.service.type }}
+  selector:
+    app: adminer
+  ports:
+    - protocol: TCP
+      port: {{ .Values.adminer.service.port }}
+      targetPort: 8080

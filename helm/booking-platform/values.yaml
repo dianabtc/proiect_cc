@@ -1,0 +1,43 @@
+mysql:
+  image: mysql:8
+  replicaCount: 1
+  servicePort: 3306
+  pvc:
+    name: mysql-pvc
+    size: 1Gi
+  credentials:
+    rootPassword: password
+    database: auth_db
+
+auth:
+  replicaCount: 1
+  image:
+    repository: auth-service
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8000
+  env:
+    # Connect to mysql Service inside cluster
+    databaseUrl: mysql+pymysql://root:password@mysql:3306/auth_db
+
+adminer:
+  replicaCount: 1
+  image: adminer
+  service:
+    type: NodePort
+    port: 8080
+
+reservation:
+  replicaCount: 1
+  image:
+    repository: reservation-service
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    port: 8000
+  env:
+    databaseUrl: mysql+pymysql://root:password@mysql:3306/reservation_db
+    authServiceUrl: http://auth-service:8000
+
