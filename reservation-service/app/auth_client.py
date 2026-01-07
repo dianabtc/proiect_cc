@@ -1,7 +1,7 @@
 import os
 import httpx
 
-AUTH_SERVICE_URL = os.getenv("AUTH_SERVICE_URL", "http://auth-service:8000")
+AUTH_SERVICE_URL = os.getenv("AUTH_SERVICE_URL", "http://auth-service:8000/auth")
 
 
 class AuthClientError(Exception):

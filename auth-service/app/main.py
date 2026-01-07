@@ -6,7 +6,7 @@ from .routes import router as auth_router
 # Create DB tables at startup
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="Auth Service")
+app = FastAPI(title="Auth Service", root_path="/auth")
 
 # Register routes
 app.include_router(auth_router)

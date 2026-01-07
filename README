@@ -4,6 +4,8 @@ alias kubectl="minikube kubectl --"
 echo 'alias kubectl="minikube kubectl --"' >> ~/.bashrc
 source ~/.bashrc
 kubectl get nodes
+# Enable ingress in cluster
+minikube addons enable ingress
 
 # Enter/Exit Minikube's Docker environment
 eval $(minikube docker-env)
@@ -27,9 +29,9 @@ kubectl get pods
 kubectl get svc
 kubectl get pvc
 
-# Access Auth Service
-kubectl port-forward service/auth-service 8000:8000 -> localhost:8000/docs
-kubectl port-forward service/reservation-service 8001:8000 -> localhost:8001/docs
+# Access Auth Service and Reservation Service (with Ingress)
+minikube tunnel
+in browser -> localhost/auth/docs and localhost/reservation/docs
 
 # Access Adminer
 minikube service adminer

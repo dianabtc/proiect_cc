@@ -39,5 +39,5 @@ reservation:
     port: 8000
   env:
     databaseUrl: mysql+pymysql://root:password@mysql:3306/reservation_db
-    authServiceUrl: http://auth-service:8000
+    authServiceUrl: http://auth-service:8000/auth
 
