@@ -14,7 +14,7 @@ auth:
   image:
     repository: auth-service
     tag: latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Never   
   service:
     type: ClusterIP
     port: 8000
@@ -34,7 +34,7 @@ reservation:
   image:
     repository: reservation-service
     tag: latest
-    pullPolicy: IfNotPresent
+    pullPolicy: Never   
   service:
     port: 8000
   env:

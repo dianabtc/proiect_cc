@@ -466,3 +466,45 @@ Pentru întrebări despre arhitectură, deployment sau funcționalitate, consult
 - ✅ Persistent storage
 - ✅ **Microserviciu utilitar grafic (Dashboard)**
 - ✅ Documentație completă
+
+
+Grafana 📈
+
+Grafana este utilizată pentru vizualizarea metricilor colectate de Prometheus, oferind grafice istorice și dashboard-uri personalizate pentru aplicație și cluster.
+
+# Obținere nume pod Grafana
+export POD_NAME=$(kubectl --namespace monitoring get pod \
+  -l "app.kubernetes.io/name=grafana,app.kubernetes.io/instance=monitoring" \
+  -o name)
+
+# Port-forward Grafana
+kubectl --namespace monitoring port-forward $POD_NAME 3000:3000
+
+# User: admin
+kubectl --namespace monitoring get secrets monitoring-grafana \
+  -o jsonpath="{.data.admin-password}" | base64 -d ; echo
+
+# Acces în browser: http://localhost:3000
+
+✔️ Monitorizare CPU / memorie pod-uri
+✔️ Monitorizare noduri Kubernetes
+✔️ Istoric metrici (nu doar „momentan”)
+✔️ Dashboard personalizat pentru aplicație
+✔️ Separare clară între management (Dashboard) și observability (Grafana)
+
+# Explicatii:
+
+Sistemul de monitorizare a fost implementat folosind Metrics Server pentru metrici de bază Kubernetes și kube-prometheus-stack pentru colectarea și vizualizarea metricilor avansate. Prometheus colectează date despre noduri și poduri, iar Grafana este utilizată pentru afișarea acestora într-un dashboard dedicat.
+
+Dashboard-ul Grafana afișează utilizarea CPU, memorie și uptime pentru podurile aplicației, precum și resursele nodurilor din cluster.
+
+1. CPU Usage per Pod - Este un grafic liniar care arată consumul de resurse în timp. Calculează rata de utilizare a procesorului (CPU) pentru fiecare pod în parte din namespace-ul "default", pe un interval de 1 minut.
+
+2. Memory Usage per Pod - Albastru (mysql): Este de departe cel mai mare consumator, utilizând constant aproximativ 300 MB. Folosim container_memory_usage_bytes pentru a raporta valoarea absolută a memoriei utilizate în bytes. Această vizualizare este utilă pentru a verifica dacă există memory leaks.
+
+3. Node CPU Usage - Acesta monitorizează sănătatea întregului nod Kubernetes (identificat prin IP-ul 192.168.49.2:9100). Nodul nu este suprasolicitat (nu atinge valoarea 1.0 sau peste, în funcție de numărul de nuclee), dar are o activitate dinamică.
+
+4. Node Memory Usage - Graficul arată un consum total de memorie al sistemului între 4,52 GB și 4,66 GB.
+
+5. Application Uptime - Durata de funcționare. Liniile sunt diagonale perfecte, urcând constant în timp. Aceasta este o dovadă clară că aplicațiile nu s-au restartat în intervalul monitorizat.
+
