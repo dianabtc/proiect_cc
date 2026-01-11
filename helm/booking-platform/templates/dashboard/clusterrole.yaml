@@ -33,7 +33,7 @@ metadata:
 rules:
   # Allow to view all resources
   - apiGroups: [""]
-    resources: ["pods", "services", "nodes", "namespaces", "events", "endpoints", "persistentvolumes", "persistentvolumeclaims", "configmaps", "secrets"]
+    resources: ["pods", "services", "nodes", "namespaces", "events", "endpoints", "persistentvolumes", "persistentvolumeclaims", "configmaps", "secrets", "resourcequotas"]
     verbs: ["get", "list", "watch"]
   - apiGroups: ["apps"]
     resources: ["deployments", "daemonsets", "replicasets", "statefulsets"]
@@ -41,8 +41,11 @@ rules:
   - apiGroups: ["batch"]
     resources: ["jobs", "cronjobs"]
     verbs: ["get", "list", "watch"]
+  - apiGroups: ["autoscaling"]
+    resources: ["horizontalpodautoscalers"]
+    verbs: ["get", "list", "watch"]
   - apiGroups: ["networking.k8s.io"]
-    resources: ["ingresses", "networkpolicies"]
+    resources: ["ingresses", "networkpolicies", "ingressclasses"]
     verbs: ["get", "list", "watch"]
   - apiGroups: ["storage.k8s.io"]
     resources: ["storageclasses"]

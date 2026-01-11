@@ -6,7 +6,7 @@ metadata:
   labels:
     app: portainer
 spec:
-  replicas: {{ .Values.dashboard.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
       app: portainer
@@ -18,8 +18,8 @@ spec:
       serviceAccountName: portainer
       containers:
         - name: portainer
-          image: {{ .Values.dashboard.image.repository }}:{{ .Values.dashboard.image.tag }}
-          imagePullPolicy: {{ .Values.dashboard.image.pullPolicy }}
+          image: portainer/portainer-ce:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 9000
               protocol: TCP
@@ -34,5 +34,4 @@ spec:
       volumes:
         - name: portainer-data
           persistentVolumeClaim:
-            claimName: {{ .Values.dashboard.pvc.name }}
-
+            claimName: portainer-data

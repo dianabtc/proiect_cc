@@ -44,10 +44,13 @@ reservation:
 dashboard:
   replicaCount: 1
   image:
-    repository: kubernetesui/dashboard
-    tag: v2.7.0
+    repository: portainer/portainer-ce
+    tag: latest
     pullPolicy: IfNotPresent
   service:
-    type: ClusterIP
-    port: 8443
-    nodePort: 30443  # Only used if type is NodePort
+    type: NodePort
+    port: 9000
+    nodePort: 30900  # Only used if type is NodePort
+  pvc:
+    name: portainer-data
+    size: 1Gi

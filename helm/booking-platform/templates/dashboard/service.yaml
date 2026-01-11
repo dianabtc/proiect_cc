@@ -1,19 +1,19 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: kubernetes-dashboard
+  name: portainer
   namespace: kubernetes-dashboard
   labels:
-    app: kubernetes-dashboard
+    app: portainer
 spec:
   type: {{ .Values.dashboard.service.type }}
   ports:
     - port: {{ .Values.dashboard.service.port }}
-      targetPort: 8443
+      targetPort: 9000
       protocol: TCP
       {{- if eq .Values.dashboard.service.type "NodePort" }}
       nodePort: {{ .Values.dashboard.service.nodePort }}
       {{- end }}
   selector:
-    app: kubernetes-dashboard
+    app: portainer
 
