@@ -28,10 +28,10 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     CURRENT_DIR=$(pwd)
     
     cd ../../auth-service
-    docker build -t auth-service:latest .
+    sudo docker build -t auth-service:latest .
     
     cd ../reservation-service
-    docker build -t reservation-service:latest .
+    sudo docker build -t reservation-service:latest .
     
     cd "$CURRENT_DIR"
     echo -e "${GREEN}✅ Docker images built${NC}"
@@ -49,7 +49,10 @@ helm upgrade --install booking-platform . \
 
 echo -e "${GREEN}✅ Helm deployment complet${NC}"
 
-# Step 4: Verificare resurse
+# Step 4: Create CSRF secret for dashboard
+echo -e "${BLUE}🔑 Creating CSRF secret for dashboard...${NC}"
+kubectl create secret generic kubernetes-dashboard-csrf --from-literal=csrf=$(openssl rand -base64 32) -n kubernetes-dashboard --dry-run=client -o yaml | kubectl apply -f -
+echo -e "${GREEN}✅ CSRF secret created${NC}"
 echo -e "${BLUE}🔍 Verificare resurse...${NC}"
 sleep 5
 
