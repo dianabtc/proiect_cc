@@ -54,3 +54,30 @@ dashboard:
   pvc:
     name: portainer-data
     size: 1Gi
+
+# Monitoring Stack Configuration - Using kube-prometheus-stack Helm chart
+monitoring:
+  enabled: true
+  useExistingStack: true
+  
+  # kube-prometheus-stack Helm overrides
+  prometheusStack:
+    grafana:
+      service:
+        type: NodePort
+        nodePort: 30301
+    prometheus:
+      service:
+        type: NodePort
+        nodePort: 30909
+
+ingress:
+  enabled: true
+  className: nginx
+  monitoring:
+    prometheus:
+      path: /prometheus(/|$)(.*)
+      enabled: true
+    grafana:
+      path: /grafana(/|$)(.*)
+      enabled: true

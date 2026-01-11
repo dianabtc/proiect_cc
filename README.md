@@ -110,11 +110,84 @@ kubectl get svc
 # Check toate resursele
 kubectl get pods                          # Aplicația
 kubectl get pods -n kubernetes-dashboard  # Dashboard
+kubectl get pods -n monitoring            # Monitoring Stack
 
 # Run verification script
 cd helm/booking-platform
 ./verify-integration.sh
+./verify-monitoring.sh                    # Verificare Monitoring Stack
 ```
+
+---
+
+## Monitoring Stack
+
+### Componente Instalate
+
+1. **Metrics Server** - Colectare metrici CPU/Memory de pe noduri
+2. **Prometheus** - Time-series database pentru metrici
+3. **Grafana** - Dashboard vizualizare metrici cu:
+   - CPU & Memory usage (cluster și per-pod)
+   - Network traffic (in/out)
+   - Disk usage
+   - Pod & Node count
+   - System uptime
+
+### Instalare Monitoring
+
+```bash
+cd helm/booking-platform
+
+# Opțiune 1: Script automat (Recomandat)
+chmod +x deploy-monitoring.sh
+./deploy-monitoring.sh
+
+# Opțiune 2: Helm direct
+helm upgrade --install booking-platform .
+
+# Verificare
+./verify-monitoring.sh
+```
+
+### Acces Dashboard-uri
+
+**Port-Forward (Local):**
+```bash
+# Prometheus metrics
+kubectl port-forward -n monitoring svc/prometheus 9090:9090
+# Vizitează: http://localhost:9090
+
+# Grafana visualization
+kubectl port-forward -n monitoring svc/grafana 3000:3000
+# Vizitează: http://localhost:3000
+# Login: admin / admin123
+```
+
+**NodePort (Din rețea):**
+```
+Prometheus: http://<node-ip>:30909
+Grafana:    http://<node-ip>:30300
+```
+
+### Monitorizare Servicii Aplicație
+
+Pentru a adăuga metrici Prometheus la serviciile FastAPI:
+
+```bash
+# 1. Update dependencies
+echo "prometheus-client==0.19.0" >> auth-service/requirements.txt
+echo "prometheus-fastapi-instrumentator==6.1.0" >> auth-service/requirements.txt
+
+# 2. Rebuild imagini și deploy
+docker build -t auth-service:latest ./auth-service
+docker build -t reservation-service:latest ./reservation-service
+helm upgrade booking-platform . 
+
+# 3. Activare monitorizare
+./enable-app-monitoring.sh
+```
+
+Vezi [LAB5_MONITORING.md](LAB5_MONITORING.md) și [PROMETHEUS_INTEGRATION.md](PROMETHEUS_INTEGRATION.md)
 
 ---
 

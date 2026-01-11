@@ -1,0 +1,87 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards
+  namespace: monitoring
+data:
+  booking-platform-dashboard.json: |
+    {
+      "dashboard": {
+        "title": "Booking Platform - Application Metrics",
+        "tags": ["booking-platform", "kubernetes"],
+        "timezone": "browser",
+        "panels": [
+          {
+            "title": "Cluster CPU Usage",
+            "targets": [
+              {
+                "expr": "sum(rate(container_cpu_usage_seconds_total[5m])) by (pod_name) * 100"
+              }
+            ],
+            "type": "graph",
+            "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+          },
+          {
+            "title": "Cluster Memory Usage",
+            "targets": [
+              {
+                "expr": "sum(container_memory_usage_bytes) by (pod_name)"
+              }
+            ],
+            "type": "graph",
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+          },
+          {
+            "title": "Pod Count",
+            "targets": [
+              {
+                "expr": "count(kube_pod_info{namespace=\"default\"})"
+              }
+            ],
+            "type": "stat",
+            "gridPos": {"h": 4, "w": 6, "x": 0, "y": 8}
+          },
+          {
+            "title": "Node Count",
+            "targets": [
+              {
+                "expr": "count(node_cpu_seconds_total)"
+              }
+            ],
+            "type": "stat",
+            "gridPos": {"h": 4, "w": 6, "x": 6, "y": 8}
+          },
+          {
+            "title": "Network In",
+            "targets": [
+              {
+                "expr": "rate(container_network_receive_bytes_total[5m])"
+              }
+            ],
+            "type": "graph",
+            "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+          },
+          {
+            "title": "Network Out",
+            "targets": [
+              {
+                "expr": "rate(container_network_transmit_bytes_total[5m])"
+              }
+            ],
+            "type": "graph",
+            "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12}
+          }
+        ],
+        "refresh": "30s",
+        "schemaVersion": 27,
+        "style": "dark",
+        "templating": {
+          "list": []
+        },
+        "time": {
+          "from": "now-6h",
+          "to": "now"
+        },
+        "uid": "booking-platform-app-metrics"
+      }
+    }

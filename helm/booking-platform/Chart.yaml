@@ -2,5 +2,14 @@ apiVersion: v2
 name: booking-platform
 description: Event booking platform - Kubernetes app managed via Helm
 type: application
-version: 0.1.0
-appVersion: "1.0"
+version: 0.2.0
+appVersion: "1.1"
+keywords:
+  - booking
+  - kubernetes
+  - monitoring
+  - prometheus
+  - grafana
+maintainers:
+  - name: Booking Platform Team
+    email: admin@booking-platform.local

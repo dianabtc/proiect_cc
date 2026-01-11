@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-app-config
+  namespace: monitoring
+data:
+  app-monitoring-guide.txt: |
+    # Monitoring Configuration for Booking Platform Applications
+    
+    ## Pentru a activa monitoring la serviciile aplicației:
+    
+    ### 1. Auth Service - Fă update la requirements.txt:
+    - Adaugă: prometheus-client==0.19.0
+    - Adaugă: prometheus-fastapi-instrumentator==6.1.0
+    
+    ### 2. Reservation Service - Fă update la requirements.txt:
+    - Adaugă: prometheus-client==0.19.0
+    - Adaugă: prometheus-fastapi-instrumentator==6.1.0
+    
+    ### 3. Documentație integrare:
+    - Vezi: PROMETHEUS_INTEGRATION.md
+    
+    ## Pod Annotations pentru Prometheus Auto-Discovery
+    Adaugă la deployment spec.template.metadata.annotations:
+    
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8000"      # Port-ul serviciului
+    prometheus.io/path: "/metrics"   # Endpoint-ul de metrici
+    
+    ## Metrici Disponibile (framework-level):
+    - http_requests_total
+    - http_request_duration_seconds
+    - http_request_size_bytes
+    - http_response_size_bytes
+    - http_requests_in_progress
+    
+    ## Custom Metrics (opțional):
+    Fiecare serviciu poate expune custom metrics:
+    
+    from prometheus_client import Counter, Histogram
+    
+    requests_counter = Counter('app_requests_total', 
+                               'Total requests',
+                               ['method', 'endpoint'])
+    
+    request_duration = Histogram('app_request_duration_seconds',
+                                'Request duration',
+                                ['endpoint'])
