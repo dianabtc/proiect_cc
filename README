@@ -25,6 +25,7 @@ docker build -t reservation-service:latest .
 cd ../proiect_cc
 helm install booking ./helm/booking-platform
 helm upgrade booking ./helm/booking-platform
+helm uninstall booking
 kubectl get pods
 kubectl get svc
 kubectl get pvc
@@ -38,6 +39,9 @@ minikube service adminer
 server: mysql
 user: root
 password: password
+
+# Acces db locally
+kubectl exec -it deployment/mysql -- mysql -u root -p
 
 
 ## Restart deployment:
