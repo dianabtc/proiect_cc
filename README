@@ -1,29 +1,29 @@
-# 🎟️ Booking Platform - Platformă de Rezervare Săli Evenimente
+# 🎟️ Booking Platform - Event Hall Reservation Platform
 
-Proiect **Cloud Computing** - Platformă de rezervare online pentru săli de evenimente implementată cu arhitectură de microservicii pe Kubernetes.
+**Cloud Computing** Project - Online reservation platform for event halls implemented with microservices architecture on Kubernetes.
 
 ---
 
-## 📋 Descriere
+## 📋 Description
 
-Aplicație web pentru gestionarea rezervărilor de săli evenimente cu sistem de autentificare și autorizare bazat pe roluri (USER/ADMIN).
+Web application for managing event hall reservations with role-based authentication and authorization system (USER/ADMIN).
 
 ### Business Logic
 
-**Roluri și Permisiuni:**
-- **USER**: Creează rezervări proprii, vede doar rezervările proprii
-- **ADMIN**: Gestionează săli (CRUD), vede și anulează orice rezervare
+**Roles and Permissions:**
+- **USER**: Creates own reservations, views only own reservations
+- **ADMIN**: Manages halls (CRUD), views and cancels any reservation
 
-**Funcționalități Cheie:**
-1. **Gestionare Săli** - ADMIN poate crea/edita/șterge săli
-2. **Rezervări cu Validare** - Sistem automat de detectare conflicte temporale
-3. **Autentificare JWT** - Token-based authentication securizat
-4. **Autorizare pe Roluri** - RBAC la nivel de endpoint
-5. **Management Cluster** - Kubernetes Dashboard pentru monitorizare
+**Key Features:**
+1. **Hall Management** - ADMIN can create/edit/delete halls
+2. **Reservations with Validation** - Automatic time conflict detection system
+3. **JWT Authentication** - Secure token-based authentication
+4. **Role-Based Authorization** - RBAC at endpoint level
+5. **Cluster Management** - Portainer Dashboard for monitoring
 
 ---
 
-## 🏗️ Arhitectură
+## 🏗️ Architecture
 
 ```
 ┌─────────────────────────────────────────────────────┐
@@ -32,7 +32,7 @@ Aplicație web pentru gestionarea rezervărilor de săli evenimente cu sistem de
 └────────┬─────────────┬──────────────┬───────────────┘
          │             │              │
     ┌────▼────┐   ┌────▼────┐   ┌────▼──────────┐
-    │  Auth   │   │Reserv.  │   │  Kubernetes   │
+    │  Auth   │   │Reserv.  │   │  Portainer    │
     │ Service │──▶│ Service │   │  Dashboard    │
     └────┬────┘   └────┬────┘   └───────────────┘
          │             │
@@ -44,17 +44,17 @@ Aplicație web pentru gestionarea rezervărilor de săli evenimente cu sistem de
          └─────────────┘
 ```
 
-### Componente
+### Components
 
-| Componentă | Tehnologie | Port | Rol |
+| **Component** | **Technology** | **Port** | **Role** |
 |------------|------------|------|-----|
-| **Auth Service** | FastAPI | 8000 | Autentificare JWT |
-| **Reservation Service** | FastAPI | 8000 | Logică business |
-| **MySQL** | MySQL 8 | 3306 | Persistență date |
-| **Adminer** | Adminer | 8080 | Admin DB (NodePort) |
-| **Kubernetes Dashboard** | Official K8s UI | 8443 | Management cluster |
+| **Auth Service** | FastAPI | 8000 | JWT Authentication |
+| **Reservation Service** | FastAPI | 8000 | Business logic |
+| **MySQL** | MySQL 8 | 3306 | Data persistence |
+| **Adminer** | Adminer | 8080 | DB Admin (NodePort) |
+| **Portainer** | Portainer CE | 9000 | Cluster management UI |
 
-**📚 Pentru arhitectură detaliată, flow-uri și explicații complete:** → **[ARCHITECTURE.md](ARCHITECTURE.md)**
+**📚 For detailed architecture, flows and complete explanations:** → **[ARCHITECTURE.md](ARCHITECTURE.md)**
 
 ---
 
@@ -63,7 +63,7 @@ Aplicație web pentru gestionarea rezervărilor de săli evenimente cu sistem de
 ### Prerequisites
 
 ```bash
-# Verifică instalări necesare
+# Check required installations
 docker --version          # Docker 20+
 kubectl version          # Kubernetes 1.24+
 helm version            # Helm 3.x
@@ -71,127 +71,127 @@ helm version            # Helm 3.x
 
 ### Deployment
 
-#### Metoda 1: Script Automat (Recomandat) ⭐
+#### Method 1: Automated Script (Recommended) ⭐
 
 ```bash
 cd helm/booking-platform
 ./deploy.sh
 ```
 
-Script-ul va:
-- ✅ Build Docker images (opțional)
-- ✅ Deploy toate serviciile cu Helm
-- ✅ Aștepta ca pod-urile să fie ready
-- ✅ Genera token pentru Dashboard
-- ✅ Oferi opțiunea de port-forward automat
+Script will:
+- ✅ Build Docker images (optional)
+- ✅ Deploy all services with Helm
+- ✅ Wait for pods to be ready
+- ✅ Generate Dashboard token
+- ✅ Offer automatic port-forward option
 
-#### Metoda 2: Manual
+#### Method 2: Manual
 
 ```bash
-# 1. Build imagini
+# 1. Build images
 cd auth-service
 docker build -t auth-service:latest .
 
 cd ../reservation-service
 docker build -t reservation-service:latest .
 
-# 2. Deploy cu Helm
+# 2. Deploy with Helm
 cd ../helm/booking-platform
 helm upgrade --install booking-platform . --namespace default --create-namespace
 
-# 3. Verificare
+# 3. Verification
 kubectl get pods
 kubectl get svc
 ```
 
-### Verificare Deployment
+### Deployment Verification
 
 ```bash
-# Check toate resursele
-kubectl get pods                          # Aplicația
+# Check all resources
+kubectl get pods                          # Application
 kubectl get pods -n kubernetes-dashboard  # Dashboard
 kubectl get pods -n monitoring            # Monitoring Stack
 
 # Run verification script
 cd helm/booking-platform
 ./verify-integration.sh
-./verify-monitoring.sh                    # Verificare Monitoring Stack
+./verify-monitoring.sh                    # Verify Monitoring Stack
 ```
 
 ---
 
 ## Monitoring Stack
 
-### Componente Instalate
+### Installed Components
 
-1. **Metrics Server** - Colectare metrici CPU/Memory de pe noduri
-2. **Prometheus** - Time-series database pentru metrici
-3. **Grafana** - Dashboard vizualizare metrici cu:
-   - CPU & Memory usage (cluster și per-pod)
+1. **Metrics Server** - CPU/Memory metrics collection from nodes
+2. **Prometheus** - Time-series database for metrics
+3. **Grafana** - Metrics visualization dashboard with:
+   - CPU & Memory usage (cluster and per-pod)
    - Network traffic (in/out)
    - Disk usage
    - Pod & Node count
    - System uptime
 
-### Instalare Monitoring
+### Install Monitoring
 
 ```bash
 cd helm/booking-platform
 
-# Opțiune 1: Script automat (Recomandat)
+# Option 1: Automated script (Recommended)
 chmod +x deploy-monitoring.sh
 ./deploy-monitoring.sh
 
-# Opțiune 2: Helm direct
+# Option 2: Helm direct
 helm upgrade --install booking-platform .
 
-# Verificare
+# Verification
 ./verify-monitoring.sh
 ```
 
-### Acces Dashboard-uri
+### Access Dashboards
 
 **Port-Forward (Local):**
 ```bash
 # Prometheus metrics
 kubectl port-forward -n monitoring svc/prometheus 9090:9090
-# Vizitează: http://localhost:9090
+# Visit: http://localhost:9090
 
 # Grafana visualization
 kubectl port-forward -n monitoring svc/grafana 3000:3000
-# Vizitează: http://localhost:3000
+# Visit: http://localhost:3000
 # Login: admin / admin123
 ```
 
-**NodePort (Din rețea):**
+**NodePort (From network):**
 ```
 Prometheus: http://<node-ip>:30909
 Grafana:    http://<node-ip>:30300
 ```
 
-### Monitorizare Servicii Aplicație
+### Application Services Monitoring
 
-Pentru a adăuga metrici Prometheus la serviciile FastAPI:
+To add Prometheus metrics to FastAPI services:
 
 ```bash
 # 1. Update dependencies
 echo "prometheus-client==0.19.0" >> auth-service/requirements.txt
 echo "prometheus-fastapi-instrumentator==6.1.0" >> auth-service/requirements.txt
 
-# 2. Rebuild imagini și deploy
+# 2. Rebuild images and deploy
 docker build -t auth-service:latest ./auth-service
 docker build -t reservation-service:latest ./reservation-service
 helm upgrade booking-platform . 
 
-# 3. Activare monitorizare
+# 3. Enable monitoring
 ./enable-app-monitoring.sh
 ```
 
-Vezi [LAB5_MONITORING.md](LAB5_MONITORING.md) și [PROMETHEUS_INTEGRATION.md](PROMETHEUS_INTEGRATION.md)
+See [LAB5_MONITORING.md](LAB5_MONITORING.md) and [PROMETHEUS_INTEGRATION.md](PROMETHEUS_INTEGRATION.md)
 
 ---
 
-## 🌐 Acces la Servicii
+## 🌐 Access Services
 
 ### API Services
 
@@ -222,62 +222,65 @@ curl -X POST http://localhost/reservation/reservations \
   }'
 ```
 
-### Kubernetes Dashboard 📊
+### Portainer Dashboard 📊
 
-**Dashboard oferă vizualizare completă asupra clusterului:**
+**Dashboard provides complete cluster visualization:**
 
 ```bash
-# 1. Get authentication token
-kubectl -n kubernetes-dashboard create token admin-user
+# Option 1: Use minikube service (Recommended)
+minikube service portainer -n kubernetes-dashboard
+# Will automatically open browser with correct URL
 
-# 2. Port forward (acces local)
-kubectl port-forward -n kubernetes-dashboard service/kubernetes-dashboard 8443:8443
-
-# 3. Accesează în browser
-open https://localhost:8443
-
-# 4. Login cu token-ul generat
+# Option 2: Port forward (local access)
+kubectl port-forward -n kubernetes-dashboard svc/portainer 9000:9000
+# Then access: http://localhost:9000
 ```
 
-**Ce poți face în Dashboard:**
-- ✅ Vezi toate pod-urile, deployments, services
-- ✅ Monitorizează CPU/Memory în timp real
-- ✅ Accesezi logs din orice container
-- ✅ Scale deployments (change replicas)
-- ✅ Restart pods, debug evenimente
-- ✅ Vizualizează PVC, ConfigMaps, Secrets
+**First-time setup:**
+- Create admin user (username + password)
+- Select "Local" environment
+- Click "Connect"
+
+**What you can do in Portainer:**
+- ✅ View all pods, deployments, services from all namespaces
+- ✅ Monitor status and resource usage
+- ✅ Access logs from any container
+- ✅ Exec into containers (interactive terminal)
+- ✅ Manage volumes (mysql-pvc, portainer-data)
+- ✅ Deploy new applications from templates
+- ✅ Visualize images, networks, stacks
 
 ---
 
-## 📁 Structură Proiect
+## 📁 Project Structure
 
 ```
 proiect_cc/
-├── auth-service/              # Microserviciu autentificare
-│   ├── app/                   # Cod FastAPI
+├── auth-service/              # Authentication microservice
+│   ├── app/                   # FastAPI code
 │   ├── Dockerfile
 │   └── requirements.txt
 │
-├── reservation-service/       # Microserviciu rezervări
-│   ├── app/                   # Cod FastAPI
+├── reservation-service/       # Reservation microservice
+│   ├── app/                   # FastAPI code
 │   ├── Dockerfile
 │   └── requirements.txt
 │
 ├── helm/booking-platform/     # Helm chart
 │   ├── Chart.yaml
-│   ├── values.yaml           # Configurări centrale
-│   ├── deploy.sh             # Script deployment
-│   ├── verify-integration.sh # Script verificare
+│   ├── values.yaml           # Central configuration
+│   ├── deploy.sh             # Deployment script
+│   ├── verify-integration.sh # Verification script
 │   └── templates/
-│       ├── auth/             # K8s manifests Auth
-│       ├── reservation/      # K8s manifests Reservation
-│       ├── mysql/            # K8s manifests MySQL
-│       ├── adminer/          # K8s manifests Adminer
-│       ├── dashboard/        # K8s manifests Dashboard (10 files)
-│       └── ingress.yaml      # Routing extern
+│       ├── auth/             # Auth K8s manifests
+│       ├── reservation/      # Reservation K8s manifests
+│       ├── mysql/            # MySQL K8s manifests
+│       ├── adminer/          # Adminer K8s manifests
+│       ├── dashboard/        # Dashboard K8s manifests (10 files)
+│       └── ingress.yaml      # External routing
 │
-├── README.md                 # Acest fișier
-└── ARCHITECTURE.md          # 📚 Documentație tehnică completă
+├── README.md                 # This file
+└── ARCHITECTURE.md          # 📚 Complete technical documentation
 ```
 
 ---
@@ -288,30 +291,30 @@ proiect_cc/
 
 | Method | Endpoint | Description | Auth |
 |--------|----------|-------------|------|
-| POST | `/auth/register` | Înregistrare utilizator nou | - |
-| POST | `/auth/login` | Login, returnează JWT token | - |
-| GET | `/auth/validate` | Validare token (inter-service) | Bearer |
+| POST | `/auth/register` | Register new user | - |
+| POST | `/auth/login` | Login, returns JWT token | - |
+| GET | `/auth/validate` | Token validation (inter-service) | Bearer |
 
 ### Reservation Service (`/reservation`)
 
 | Method | Endpoint | Description | Auth | Role |
 |--------|----------|-------------|------|------|
-| GET | `/reservation/halls` | Listează săli | - | PUBLIC |
-| POST | `/reservation/halls` | Creează sală | Bearer | ADMIN |
-| PATCH | `/reservation/halls/{id}` | Editează sală | Bearer | ADMIN |
-| DELETE | `/reservation/halls/{id}` | Șterge sală | Bearer | ADMIN |
-| GET | `/reservation/availability` | Verifică disponibilitate | - | PUBLIC |
-| POST | `/reservation/reservations` | Creează rezervare | Bearer | USER |
-| GET | `/reservation/reservations` | Listează rezervări (proprii/toate) | Bearer | USER/ADMIN |
-| POST | `/reservation/reservations/{id}/cancel` | Anulează rezervare | Bearer | USER/ADMIN |
+| GET | `/reservation/halls` | List halls | - | PUBLIC |
+| POST | `/reservation/halls` | Create hall | Bearer | ADMIN |
+| PATCH | `/reservation/halls/{id}` | Edit hall | Bearer | ADMIN |
+| DELETE | `/reservation/halls/{id}` | Delete hall | Bearer | ADMIN |
+| GET | `/reservation/availability` | Check availability | - | PUBLIC |
+| POST | `/reservation/reservations` | Create reservation | Bearer | USER |
+| GET | `/reservation/reservations` | List reservations (own/all) | Bearer | USER/ADMIN |
+| POST | `/reservation/reservations/{id}/cancel` | Cancel reservation | Bearer | USER/ADMIN |
 
 ---
 
-## 🛠️ Configurare și Management
+## 🛠️ Configuration and Management
 
 ### Environment Variables
 
-Configurate în `values.yaml`:
+Configured in `values.yaml`:
 
 ```yaml
 auth:
@@ -325,29 +328,29 @@ reservation:
 
 dashboard:
   service:
-    type: ClusterIP  # Sau NodePort pentru acces direct
-    port: 8443
+    type: ClusterIP  # Or NodePort for direct access
+    port: 9000
 ```
 
 ### Scaling
 
 ```bash
-# Scale la nivel de deployment
+# Scale at deployment level
 kubectl scale deployment auth-service --replicas=3
 
-# Sau modifică în values.yaml și upgrade
+# Or modify in values.yaml and upgrade
 helm upgrade booking-platform . --set auth.replicaCount=3
 ```
 
-### Logs și Monitoring
+### Logs and Monitoring
 
 ```bash
-# Logs din servicii
+# Logs from services
 kubectl logs -f deployment/auth-service
 kubectl logs -f deployment/reservation-service
 
-# Logs Dashboard
-kubectl logs -f -n kubernetes-dashboard deployment/kubernetes-dashboard
+# Dashboard logs
+kubectl logs -f -n kubernetes-dashboard deployment/portainer
 
 # Events (debugging)
 kubectl get events --sort-by='.lastTimestamp'
@@ -361,9 +364,9 @@ kubectl top pods
 
 ## 🐛 Troubleshooting
 
-### Probleme Comune
+### Common Issues
 
-**Pods nu pornesc:**
+**Pods not starting:**
 ```bash
 kubectl describe pod <pod-name>
 kubectl logs <pod-name>
@@ -375,167 +378,169 @@ kubectl logs deployment/mysql
 kubectl exec -it deployment/mysql -- mysql -u root -ppassword -e "SHOW DATABASES;"
 ```
 
-**Ingress nu funcționează:**
+**Ingress not working:**
 ```bash
 kubectl get ingress -A
 kubectl describe ingress booking-ingress
 
-# Enable Ingress în minikube
+# Enable Ingress in minikube
 minikube addons enable ingress
 ```
 
-**Dashboard token expirat:**
+**Dashboard token expired:**
 ```bash
-kubectl -n kubernetes-dashboard create token admin-user
+# Regenerate access to Portainer (if needed)
+kubectl port-forward -n kubernetes-dashboard svc/portainer 9000:9000
 ```
 
-**📚 Pentru troubleshooting detaliat:** → **[ARCHITECTURE.md](ARCHITECTURE.md#troubleshooting)**
+**📚 For detailed troubleshooting:** → **[ARCHITECTURE.md](ARCHITECTURE.md#troubleshooting)**
 
 ---
 
-## 🔒 Securitate
+## 🔒 Security
 
-### Măsuri de Securitate Implementate
+### Implemented Security Measures
 
-- ✅ **Password Hashing**: bcrypt pentru passwords
-- ✅ **JWT Authentication**: Token-based auth cu expirare
-- ✅ **RBAC**: Role-Based Access Control la nivel de endpoint
-- ✅ **Kubernetes RBAC**: ServiceAccounts cu permisiuni limitate
-- ✅ **HTTPS**: Dashboard folosește HTTPS cu certificat auto-generat
-- ✅ **Token Expiration**: JWT tokens expiră după 24h
+- ✅ **Password Hashing**: bcrypt for passwords
+- ✅ **JWT Authentication**: Token-based auth with expiration
+- ✅ **RBAC**: Role-Based Access Control at endpoint level
+- ✅ **Kubernetes RBAC**: ServiceAccounts with limited permissions
+- ✅ **HTTPS**: Dashboard uses HTTPS with self-signed certificate
+- ✅ **Token Expiration**: JWT tokens expire after 24h
 
-### ⚠️ Pentru Producție
+### ⚠️ For Production
 
 ```bash
-# 1. Schimbă credențiale MySQL
+# 1. Change MySQL credentials
 kubectl create secret generic mysql-credentials \
   --from-literal=root-password=$(openssl rand -base64 20)
 
-# 2. Folosește Secrets pentru JWT
+# 2. Use Secrets for JWT
 kubectl create secret generic jwt-secret \
   --from-literal=key=$(openssl rand -base64 32)
 
-# 3. Configurează TLS pentru Ingress
-# 4. Limitează RBAC permissions pentru Dashboard
+# 3. Configure TLS for Ingress
+# 4. Limit RBAC permissions for Dashboard
 # 5. Enable Network Policies
 ```
 
 ---
 
-## 📊 Features Proiect
+## 📊 Project Features
 
-### ✅ Implementat
+### ✅ Implemented
 
-- [x] Arhitectură Microservicii
-- [x] Containerizare cu Docker
-- [x] Orchestrare cu Kubernetes
-- [x] Helm Charts pentru deployment
+- [x] Microservices Architecture
+- [x] Containerization with Docker
+- [x] Orchestration with Kubernetes
+- [x] Helm Charts for deployment
 - [x] JWT Authentication
 - [x] Role-Based Access Control (RBAC)
 - [x] Database Persistence (MySQL + PVC)
 - [x] Ingress Routing (NGINX)
-- [x] **Kubernetes Dashboard** - Microserviciu utilitar grafic
-- [x] Metrics Scraper pentru Dashboard
-- [x] Health Checks pentru toate serviciile
+- [x] **Portainer Dashboard** - Graphical utility microservice
+- [x] Metrics Scraper for Dashboard
+- [x] Health Checks for all services
 - [x] DB Admin UI (Adminer)
-- [x] Documentație completă
+- [x] Complete documentation
 
-### 🎯 Demonstrează
+### 🎯 Demonstrates
 
 - Cloud-Native architecture
-- Service Discovery automat
+- Automatic Service Discovery
 - Horizontal scaling ready
 - Persistent storage
 - Secret management
 - Infrastructure as Code (IaC)
-- Observability și monitoring
+- Observability and monitoring
 
 ---
 
-## 📚 Documentație Completă
+## 📚 Complete Documentation
 
 ### **[→ ARCHITECTURE.md](ARCHITECTURE.md)** 
 
-Documentație tehnică completă cu:
-- 📐 **Arhitectură detaliată** cu diagrame
-- 🔄 **Flow-uri de date** pentru fiecare operațiune
-- 🌐 **Networking** și comunicare inter-service
-- 🔐 **Securitate** și RBAC detaliat
-- 🚀 **Deployment guide** pas cu pas
-- 🐛 **Troubleshooting** complet
-- 📊 **Kubernetes Dashboard** - explicații complete
+Complete technical documentation with:
+- 📐 **Detailed architecture** with diagrams
+- 🔄 **Data flows** for each operation
+- 🌐 **Networking** and inter-service communication
+- 🔐 **Security** and detailed RBAC
+- 🚀 **Deployment guide** step by step
+- 🐛 **Complete troubleshooting**
+- 📊 **Kubernetes Dashboard** - complete explanations
 
-### Scripturi Disponibile
+### Available Scripts
 
 ```bash
-# Deployment automat complet
+# Complete automated deployment
 ./helm/booking-platform/deploy.sh
 
-# Verificare integrare
+# Integration verification
 ./helm/booking-platform/verify-integration.sh
 ```
 
 ---
 
-## 🎓 Use Cases Demonstrație
+## 🎓 Demo Use Cases
 
-**1. Arhitectură Cloud-Native:**
-- "Aplicația folosește 4 microservicii independente..."
-- Arată în Dashboard: deployments vizuale
+**1. Cloud-Native Architecture:**
+- "The application uses 4 independent microservices..."
+- Show in Dashboard: visual deployments
 
-**2. Scalare Orizontală:**
-- "Putem scala instant cu un click..."
-- Demo: Scale auth-service 1→3 replicas în Dashboard
+**2. Horizontal Scaling:**
+- "We can scale instantly with one click..."
+- Demo: Scale auth-service 1→3 replicas in Dashboard
 
-**3. Monitoring Real-time:**
-- "Monitorizăm resurse și logs în timp real..."
-- Demo: Vezi logs live din reservation-service
+**3. Real-time Monitoring:**
+- "We monitor resources and logs in real-time..."
+- Demo: View live logs from reservation-service
 
 **4. High Availability:**
-- "Kubernetes asigură self-healing..."
-- Demo: Delete pod → K8s recreează automat
+- "Kubernetes ensures self-healing..."
+- Demo: Delete pod → K8s recreates automatically
 
 **5. Persistent Data:**
-- "Datele supraviețuiesc restart-urilor..."
-- Demo: Arată PVC bound în Dashboard
+- "Data survives restarts..."
+- Demo: Show PVC bound in Dashboard
 
 ---
 
-## 🤝 Tehnologii Folosite
+## 🤝 Technologies Used
 
-| Categorie | Tehnologie | Versiune |
+| Category | Technology | Version |
 |-----------|------------|----------|
 | **Backend** | FastAPI | 0.110.0 |
 | **Database** | MySQL | 8.0 |
 | **ORM** | SQLAlchemy | 2.0 |
 | **Auth** | JWT (PyJWT) | - |
 | **Container** | Docker | - |
-| **Orchestrare** | Kubernetes | 1.24+ |
+| **Orchestration** | Kubernetes | 1.24+ |
 | **Package Mgmt** | Helm | 3.x |
 | **Ingress** | NGINX Ingress Controller | - |
-| **Management** | Kubernetes Dashboard | v2.7.0 |
+| **Management** | Portainer CE | latest |
 | **DB Admin** | Adminer | latest |
+| **Monitoring** | Prometheus + Grafana | - |
 
 ---
 
-## 📝 Licență
+## 📝 License
 
-Proiect academic - Cloud Computing 2026
+Academic project - Cloud Computing 2026
 
 ---
 
 ## 📞 Contact & Support
 
-Pentru întrebări despre arhitectură, deployment sau funcționalitate, consultă **[ARCHITECTURE.md](ARCHITECTURE.md)**.
+For questions about architecture, deployment or functionality, consult **[ARCHITECTURE.md](ARCHITECTURE.md)**.
 
 ---
 
-**⭐ Proiect complet funcțional și production-ready cu Kubernetes Dashboard pentru management cluster!** 🚀
+**⭐ Fully functional and production-ready project with Portainer Dashboard for cluster management!** 🚀
 
-**🎯 Toate cerințele proiectului sunt îndeplinite:**
-- ✅ Microservicii independente
-- ✅ Containerizare
-- ✅ Orchestrare Kubernetes
+**🎯 All project requirements met:**
+- ✅ Independent microservices
+- ✅ Containerization
+- ✅ Kubernetes orchestration
 - ✅ Persistent storage
-- ✅ **Microserviciu utilitar grafic (Dashboard)**
-- ✅ Documentație completă
+- ✅ **Graphical utility microservice (Dashboard)**
+- ✅ Complete documentation

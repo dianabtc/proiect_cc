@@ -57,7 +57,25 @@ Authenticate with credentials:
 - user: root
 - password:
 
-# C. MySQL database (internally)
+# C. Portainer Dashboard (with NodePort)
+Run: minikube service portainer -n kubernetes-dashboard
+Access in browser at: http://<MINIKUBE_IP>:30900
+Alternative: kubectl port-forward -n kubernetes-dashboard svc/portainer 9000:9000
+Then access: http://localhost:9000
+
+First time setup:
+- Create admin user with username and password
+- Select "Local" environment to manage the Kubernetes cluster
+- Dashboard shows: containers, images, volumes, networks, stacks
+
+Features:
+- Visual cluster management interface
+- Monitor pods, deployments, services across all namespaces
+- View logs and exec into containers
+- Manage resources (create, edit, delete)
+- View resource usage and metrics
+
+# D. MySQL database (internally)
 kubectl exec -it deployment/mysql -- mysql -u root -p
 
 ### 8. Monitoring Stack (Grafana + Prometheus)
@@ -93,5 +111,10 @@ Use queries like:
 ## Commands to restart deployments:
 kubectl rollout restart deployment auth-service
 kubectl rollout restart deployment reservation-service
+kubectl rollout restart deployment portainer -n kubernetes-dashboard
 kubectl rollout restart deployment monitoring-grafana -n monitoring
 kubectl rollout restart deployment monitoring-kube-prometheus-operator -n monitoring
+
+## Check dashboard pods:
+kubectl get pods -n kubernetes-dashboard
+kubectl logs -f deployment/portainer -n kubernetes-dashboard
