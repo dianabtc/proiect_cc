@@ -60,8 +60,38 @@ Authenticate with credentials:
 # C. MySQL database (internally)
 kubectl exec -it deployment/mysql -- mysql -u root -p
 
+### 8. Monitoring Stack (Grafana + Prometheus)
+
+# 8.1 Start Monitoring (Quick Start)
+./start-monitoring.sh
+# This will port-forward both Grafana and Prometheus
+
+# 8.2 Access Grafana
+URL: http://localhost:3000
+Username: admin
+Password: admin123
+
+# 8.3 Access Prometheus
+URL: http://localhost:9090
+
+# 8.4 Manually start port-forwards (if not using start-monitoring.sh)
+kubectl port-forward -n monitoring svc/monitoring-grafana 3000:3000
+kubectl port-forward -n monitoring svc/monitoring-kube-prometheus-prometheus 9090:9090
+
+# 8.5 Check monitoring pods
+kubectl get pods -n monitoring
+
+# 8.6 Create Grafana Dashboard with Prometheus queries
+See PROMETHEUS_QUERIES.md for sample queries
+Use queries like:
+- Pod count: count(kube_pod_info)
+- CPU usage: sum(rate(container_cpu_usage_seconds_total[5m]))
+- Memory usage: sum(container_memory_usage_bytes) / 1024 / 1024 / 1024
+
 
 
 ## Commands to restart deployments:
 kubectl rollout restart deployment auth-service
 kubectl rollout restart deployment reservation-service
+kubectl rollout restart deployment monitoring-grafana -n monitoring
+kubectl rollout restart deployment monitoring-kube-prometheus-operator -n monitoring
